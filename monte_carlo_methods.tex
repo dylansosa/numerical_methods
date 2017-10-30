@@ -1,0 +1,267 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Jacobs Landscape Poster
+% LaTeX Template
+% Version 1.0 (29/03/13)
+%
+% Created by:
+% Computational Physics and Biophysics Group, Jacobs University
+% https://teamwork.jacobs-university.de:8443/confluence/display/CoPandBiG/LaTeX+Poster
+% 
+% Further modified by:
+% Nathaniel Johnston (nathaniel@njohnston.ca)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[final]{beamer}
+
+\usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
+\usepackage{mathtools}
+\usetheme{confposter} % Use the confposter theme supplied with this template
+
+\setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
+\setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
+\setbeamercolor{block alerted title}{fg=white,bg=dblue!70} % Colors of the highlighted block titles
+\setbeamercolor{block alerted body}{fg=black,bg=dblue!10} % Colors of the body of highlighted blocks
+% Many more colors are available for use in beamerthemeconfposter.sty
+
+%-----------------------------------------------------------
+% Define the column widths and overall poster size
+% To set effective sepwid, onecolwid and twocolwid values, first choose how many columns you want and how much separation you want between columns
+% In this template, the separation width chosen is 0.024 of the paper width and a 4-column layout
+% onecolwid should therefore be (1-(# of columns+1)*sepwid)/# of columns e.g. (1-(4+1)*0.024)/4 = 0.22
+% Set twocolwid to be (2*onecolwid)+sepwid = 0.464
+% Set threecolwid to be (3*onecolwid)+2*sepwid = 0.708
+
+\newlength{\sepwid}
+\newlength{\onecolwid}
+\newlength{\twocolwid}
+\newlength{\threecolwid}
+\setlength{\paperwidth}{48in} % A0 width: 46.8in
+\setlength{\paperheight}{36in} % A0 height: 33.1in
+\setlength{\sepwid}{0.024\paperwidth} % Separation width (white space) between columns
+\setlength{\onecolwid}{0.22\paperwidth} % Width of one column
+\setlength{\twocolwid}{0.464\paperwidth} % Width of two columns
+\setlength{\threecolwid}{0.708\paperwidth} % Width of three columns
+\setlength{\topmargin}{-0.5in} % Reduce the top margin size
+%-----------------------------------------------------------
+
+\usepackage{graphicx}  % Required for including images
+
+\usepackage{booktabs} % Top and bottom rules for tables
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\title{Monte Carlo Methods} % Poster title
+
+\author{Dylan Sosa, Dr. Paul Walter} % Author(s)
+
+\institute{St.~Edward's University} % Institution(s)
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
+\addtobeamertemplate{block alerted end}{}{\vspace*{2ex}} % White space under highlighted (alert) blocks
+
+\setlength{\belowcaptionskip}{2ex} % White space under figures
+\setlength\belowdisplayshortskip{2ex} % White space under equations
+
+\begin{frame}[t] % The whole poster is enclosed in one beamer frame
+
+\begin{columns}[t] % The whole poster consists of three major columns, the second of which is split into two columns twice - the [t] option aligns each column's content to the top
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The first column
+
+%----------------------------------------------------------------------------------------
+%	OBJECTIVES
+%----------------------------------------------------------------------------------------
+
+\begin{alertblock}{Objectives}
+
+Each section of this study utilizes Monte Carlo methods to achieve its goal. The purpose of this study was to successfully model very different systems using Monte Carlo algorithms. The general structure of these methods is:
+\begin{itemize}
+\item Define a domain of possible inputs.
+\item Generate inputs randomly from a probability distribution over the domain.
+\item Nascetur ridiculus mus.  
+\item Perform a deterministic computation on the inputs.
+\item Aggregate the results.
+\end{itemize}
+
+\end{alertblock}
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Introduction}
+
+Monte Carlo methods are a class of algorithms that rely on repeated random sampling to obtain numerical results. They use randomness to solve problems that might be deterministic in principle. In this study we explored these types of methods as they apply to random walks, magnetism, nuclear decay, and dimerization. Monte Carlo methods can be used to solve any problem having a probabilistic interpretation.
+
+\end{block}
+
+%------------------------------------------------
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{steps.png}
+\caption{Result of the Random Walks Monte Carlo method. Each color is a different iteration of the random walking process.}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of the first column
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The second column
+
+%----------------------------------------------------------------------------------------
+%	Section:  Random Walks
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Random Walks}
+
+A random walk is a mathematical object which describes a path that consists of a succession of random steps.
+In our study we used five different walkers (each represented by a different color in figure 1) that took 10,000 random steps. In addition to creating graphs such as figure one, we also determined the final position of each walk with equation one. After this we calculated the root-mean-square($r_{rms}$) of the displacement for each walker using equation two.
+\begin{equation}
+r = \sqrt[]{x^{2}+y^{2}}
+\end{equation}
+\\
+\begin{equation}
+r_{rms} = \sqrt[]{\dfrac{\sum\limits_{i=1}^{N_{walks}}r_{i}^{2}}{N_{walks}}}
+\end{equation}
+
+\end{block}
+
+%----------------------------------------------------------------------------------------
+%	Section:  Ising Model
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Ising Model}
+We used a Monte Carlo method to simulate the Ising Model and magnetization process by using dipoles (represented by 1s and -1s) arranged on a lattice. Energy for the system was found by equation one, total magnetization was found by equation two, and during our simulation we had to reject or accept changes in polarity depending the change to total energy; this is given by equation three.
+\begin{equation}
+E = -J\Sigma_{<ij>}s_{i}s_{j}
+\end{equation}
+\begin{equation}
+M = \Sigma_{i}s_{i}
+\end{equation}
+\begin{equation}
+P_{a} =
+\begin{cases} 
+      1 & if E_{n} \geq E_{n-1}\\
+      e^{-(E_{j}-E_{i})/(k_{B}T)} & if \ \ E_{n} > E_{n-1}
+\end{cases}
+\end{equation}
+
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ising200.png}
+\caption{Graph of the change in magnetization in a 20x20 Ising Model over 200 iterations of $magnetization().$}
+\end{figure}
+\end{block}
+\end{column} % End of column 2
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The third column
+
+%----------------------------------------------------------------------------------------
+% SECTION: Nuclear Decay Chains
+%----------------------------------------------------------------------------------------
+\begin{block}{Nuclear Decay Chains}
+Beginning with a sample of 10,000 atoms of Bi 213, we simulated the decay of the atoms over 20,000 seconds with a time step of 1 second.Figure three shows the chain and intermediate steps used during this simulation. Each time we determined if the atom decayed or not, we used a Monte Carlo method to decide. The probabilities used to make the determinations were found using equation six. Figure four show a graph of decay over time for four elements.
+\begin{figure}
+\includegraphics[width=0.25\linewidth]{chain.png}
+\caption{Decay chain of Bi 213 to Bi 209 used in this model.}
+\end{figure}
+\begin{equation}
+p(t) = 1 - e^{-t/\tau}
+\end{equation}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{decay.png}
+\caption{Decay simulation from Bi 213 to Bi 209, each line represents total atoms for each element.}
+\end{figure}
+\end{block}
+
+%----------------------------------------------------------------------------------------
+%	Section:  Cellular Processes
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Cellular Processes}
+Here we model the cellular process of dimerization (figure five) through a Monte Carlo method. To model this process we solved equation seven which treats monomer and dimer concentration as continuous variables. 
+\begin{equation}
+\frac{dm}{dt} = -K_{b}M^{2}+K_{u}D
+\end{equation}
+We also modeled stochastic and average stochastic dimerization for total molecules ranging from 2 to 10,100. Figure six shows the process for 90 molecules.
+\end{block}
+
+%----------------------------------------------------------------------------------------
+\end{column} % End of the third column
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The fourth column
+\begin{figure}
+\includegraphics[width=0.4\linewidth]{dimerize.png}
+\caption{Illustration of the stochastic process of dimerization}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.55\linewidth]{monomerdimer.png}
+\caption{Plot of monomer and dimer concentrations over time. With N = 90, we end with 40.5 dimers and 9 monomers.}
+\end{figure}
+
+
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+\begin{block}{Conclusion and Future Work}
+We have shown in this study that Monte Carlo methods can be applied to many different disciplines, systems, and investigations. We have also seen that simulation methods don't always require truly random numbers to be useful, as seen in the cellular processes section. This class of algorithms allows for quick simulation without the need for large amounts of real data or inputs. In the future we hope to compare Monte Carlo methods to other numerical methods to test efficiency and accuracy.
+\end{block}
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+
+\begin{block}{References}
+\nocite{*} % Insert publications even if they are not cited in the poster
+\small{\bibliographystyle{unsrt}
+\bibliography{sample}\vspace{0.0001in}}
+\end{block}
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+\setbeamercolor{block title}{fg=ngreen,bg=white} % Change the block title color
+
+\begin{block}{Acknowledgements}
+\small{\rmfamily{This work was supported by the School of Natural Sciences at St. Edward's University.
+Dr. Paul Walter facilitated this study and mentored the researchers.}}
+\begin{center}
+\includegraphics[width=\linewidth]{logo_horizontal_bluegold_cmyk.eps}
+\end{center}
+\end{block}
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of the fourth column
+
+\end{columns} % End of all the columns in the poster
+
+\end{frame} % End of the enclosing frame
+
+\end{document}
+
