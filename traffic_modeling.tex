@@ -1,0 +1,227 @@
+\documentclass{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage[margin=1cm]{caption}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{mathtools}
+
+\title{Project 4: Modeling Traffic Flow}
+\author{Dylan Sosa}
+
+\usepackage{datetime}
+\newdateformat{specialdate}{\THEDAY\space{\monthname}\space{\THEYEAR}}
+\date{\specialdate\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Here we model traffic flow using  five different numerical methods: Forward Time Backward Space and Forward Time Central Space Euler Methods, the Lax-Friedrichs Method, the Lax-Wendroff Method, and the MacCormack Method.
+\end{abstract}
+
+\section{Introduction}
+
+This model considers cars with a continuous traffic density, $\rho$, which is the average number of cars per unit length of road. In our model, if $\rho(x)=0$, there are no cars at that point $x$ on the road. However, if $\rho(x)=\rho max$, then the traffic density is at its maximum, and the road is highly congested.
+Traffic density obeys a conservation law where the flux is the number of cars leaving the road per unit time. It is given by $F = \rho v$, where flux equals density times velocity. Here, $v$ refers to the traffic speed at a given point of the road. Based on a 2006 paper by Hranac et. al, we adjsuted out initial conditions to be: $\rho max = 120,$ $vmax = 120,$ and $\rho crit = 60.$ The general idea for this portion of the study is illustrated in figure 1: \cite{hranac2006empirical}\par
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/velocity_and_flux.png}
+\caption{Traffic speed and flux vs traffic density.}
+\end{center}
+\end{figure}
+This study considers partial differential equations (PDEs) and ordinary differential equations (ODEs) as they apply to different one-dimensional equations and systems. PDEs are multivariable equations in which the unknown to be solved and manipulated depends on more than one independent variable. For example, $y(x,t)$, where y depends on space, $x$, and time, $t.$ In ODEs, the unknown has only one independent variable such as: $y(x)$ and $y(t)$ can have derivatives with respect to time or space--but only one or the other.\par
+The first of these aforementioned systems is convection, both linear and non-linear. Convection describes the process in which a physical property is spread through space by the motion of the medium occupying the space. In other words it is the movement of groups of molecules within fluids. One-dimensional, linear convection is given by the following equation: $\frac{\partial u}{\partial t}+c\frac{\partial u}{\partial x}=0.$ This equation represents the propagation of a wave without change in shape; the speed of the wave is $c$, with the initial condition given by $u(x,0) = u_{0}(x)$ and with an exact solution of $u(x,t) = u_{0}(x-ct)$. One-dimensional, non-liner convection is given by this equation: $\frac{\delta u}{\delta t}+u\frac{\delta u}{\delta x}=0.$ This non-liner convection equation is similar to the linear form, but the change is in that the wave is not moving with the constant speed of $c = 1$, but with the speed $u.$\par
+Diffusion is the net movement of molecules or atoms from a region of high chemical potential to a region of low chemical potential. This change in chemical potential is also referred to as a concentration gradient. A gradient being the change in value of a specific quantity. This is given by: $\frac{\delta u}{\delta t}+D\frac{\delta^2 u}{\delta x^2}=0$.\par
+The last system that will be modeled will be a convection-diffusion system using Burger’s equation. This combines both the convection and diffusion model in order to describe the physical phenomena where a physical quantity is transferred inside a physical system due to convection and diffusion. The following is Burger's equation: $\frac{\delta u}{\delta t}+u\frac{\delta u}{\delta x} = D\frac{\delta^2 u}{\delta x^2}.$\\
+
+
+
+\section{Methods}
+
+\subsection{FTBS Euler Method}
+The discretized form of our traffic flow model is shown by the following equation:
+\begin{equation}
+\frac{\rho^{n+1}_i- \rho^n_{i}}{\Delta t}+ \frac{F^n_{i}-F^n_{i-1}}{\Delta x}=0
+\end{equation}
+In this FTBS method we operate on all spatial points simultaneously by using an array data structure. Each time step we also call the function $computeF()$ that computes the flux at each point $x.$
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/FTBS_stencil.png}
+\caption{Stencil of FTBS scheme.}
+\end{center}
+\end{figure}
+
+\subsection{FTCS Euler Method}
+Traffic density is given by the following equation:
+\begin{equation} \frac{\partial \rho}{\partial t} + \frac{\partial F}{\partial x} = 0 \end{equation}
+While traffic flux is given by:
+\begin{equation} F = \rho u_{\rm max} \left(1-\frac{\rho}{\rho_{\rm max}}\right)
+\end{equation}
+For this scheme we use a forward-difference formula for discretization to obtain:
+\begin{equation}\frac{\partial \rho}{\partial t}\approx \frac{1}{\Delta t}( \rho_i^{n+1}-\rho_i^n )\end{equation}
+In a convection problem as described in the introduction, first-order discretization in space leads to numerical diffusion. In order to achieve second-order accuracy in space we used a central difference:
+\begin{equation}\frac{\partial F}{\partial x} \approx \frac{1}{2\Delta x}( F_{i+1}-F_{i-1})\end{equation}
+Combining the two equations above  to obtain a FTCS scheme is unstable. 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/FD-stencil_FTCS.png}
+\caption{Stencil of the FTCS method.}
+\end{center}
+\end{figure}
+\subsection{Lax–Friedrichs Method}
+This method attempts to stavilize the forward time, central scheme as seen in section 2.2. This method replaced the solution value at $\rho^n_{i+1}$ with the average of the values at neighboring grid points. Doing this provides the following equation: 
+\begin{equation}\frac{\rho_i^{n+1}-\frac{1}{2}(\rho^n_{i+1}+\rho^n_{i-1})}{\Delta t} = -\frac{F^n_{i+1}-F^n_{i-1}}{2 \Delta x}\end{equation}
+Doing this provides a stencil that is illustrated by figure 3. Notice that it is slightly different that figure 2 shown in section 2.2. This numerical discretization is stable, but introduces a first-order error.
+In order to implement this in computationally, we had to first isolate the value at the next time step:
+\begin{equation}\rho_i^{n+1} = \frac{1}{2}(\rho^n_{i+1}+\rho^n_{i-1}) - \frac{\Delta t}{2 \Delta x}(F^n_{i+1}-F^n_{i-1})\end{equation}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/FD-stencil_LF.png}
+\caption{Stencil of the Lax-Friedrichs method.}
+\end{center}
+\end{figure}
+
+\subsection{Lax–Wendroff Method}
+First-order methods are not suitable for problems such as the traffic system being modeled here because of the shocks that occur in the plots. The Lax-Wendroff method achieves second-order accuracy in both space and time. Beginning with the Taylor series expansion in the time variable for $\rho^n_{i+1}$:
+\begin{equation}\rho^{n+1} = \rho^n + \frac{\partial\rho^n}{\partial t} \Delta t + \frac{(\Delta t)^2}{2}\frac{\partial^2\rho^n}{\partial t^2} + \ldots \end{equation}
+\begin{equation}\frac{\partial \rho}{\partial t} = -\frac{\partial F}{\partial x} = -\frac{\partial F}{\partial \rho} \frac{\partial \rho}{\partial x} = -J \frac{\partial \rho}{\partial x}\end{equation}
+Where
+\begin{equation}J = \frac{\partial F}{\partial \rho} = u _{\rm max} \left(1-2\frac{\rho}{\rho_{\rm max}} \right)\end{equation}
+is the Jacobian for the traffic model. Next:
+\begin{equation} \frac{\partial F}{\partial t} = \frac{\partial F}{\partial \rho} \frac{\partial \rho}{\partial t} = J \frac{\partial \rho}{\partial t} = -J \frac{\partial F}{\partial x}\end{equation}
+\begin{equation}\frac{\partial^2\rho}{\partial t^2} = \frac{\partial}{\partial x} \left( J \frac{\partial F}{\partial x} \right) \end{equation}
+\begin{equation}\rho^{n+1} = \rho^n - \frac{\partial F^n}{\partial x} \Delta t + \frac{(\Delta t)^2}{2} \frac{\partial}{\partial x} \left(J\frac{\partial F^n}{\partial x} \right)+ \ldots \end{equation}
+From here we can reorganize and discretize the spatial derivatives with central differences to get the following discrete equation:
+\begin{equation}\frac{\rho_i^{n+1} - \rho_i^n}{\Delta t} = -\frac{F^n_{i+1}-F^n_{i-1}}{2 \Delta x} + \frac{\Delta t}{2} \left(\frac{(J \frac{\partial F}{\partial x})^n_{i+\frac{1}{2}}-(J \frac{\partial F}{\partial x})^n_{i-\frac{1}{2}}}{\Delta x}\right)\end{equation}
+After approximating the rightmost term and evaluating the Jacobian at the midpoints on either side we move from this:
+\begin{equation}\frac{\frac{1}{2 \Delta x}(J^n_{i+1}+J^n_i)(F^n_{i+1}-F^n_i)-\frac{1}{2 \Delta x}(J^n_i+J^n_{i-1})(F^n_i-F^n_{i-1})}{\Delta x}.\end{equation}
+To this form:
+\begin{align}
+&\frac{\rho_i^{n+1} - \rho_i^n}{\Delta t} =  
+-\frac{F^n_{i+1}-F^n_{i-1}}{2 \Delta x} + \cdots \\ \nonumber 
+&+ \frac{\Delta t}{4 \Delta x^2} \left( (J^n_{i+1}+J^n_i)(F^n_{i+1}-F^n_i)-(J^n_i+J^n_{i-1})(F^n_i-F^n_{i-1})\right)
+\end{align}
+Solving for $\rho^n_{i+1}$:
+\begin{align}
+&\rho_i^{n+1} = \rho_i^n - \frac{\Delta t}{2 \Delta x} \left(F^n_{i+1}-F^n_{i-1}\right) + \cdots \\ \nonumber 
+&+ \frac{(\Delta t)^2}{4(\Delta x)^2} \left[ (J^n_{i+1}+J^n_i)(F^n_{i+1}-F^n_i)-(J^n_i+J^n_{i-1})(F^n_i-F^n_{i-1})\right]
+\end{align}
+with 
+\begin{equation}J^n_i = \frac{\partial F}{\partial \rho} = u_{\rm max} \left(1-2\frac{\rho^n_i}{\rho_{\rm max}} \right).\end{equation}
+\subsection{MacCormack Method}
+The MacCormack method\cite{maccormack2003effect} is a two-step, central spacial scheme in which the first step is called a predictor and the second step is called a corrector. It achieves second-order accuracy in both space and time. The following version was used in this study:
+\begin{equation}\rho^*_i = \rho^n_i - \frac{\Delta t}{\Delta x} (F^n_{i+1}-F^n_{i}) \ \ \ \ \ \ \text{(predictor)}\end{equation}
+\begin{equation}\rho^{n+1}_i = \frac{1}{2} (\rho^n_i + \rho^*_i - \frac{\Delta t}{\Delta x} (F^*_i - F^{*}_{i-1})) \ \ \ \ \ \ \text{(corrector)}\end{equation}
+
+
+\subsection{Numerical Dissipation}
+
+Whether this method will be included depends on how far we get in class.  
+
+\subsection{Stability}
+The CFL condition is a necessary condition for convergence while solving certain partial differential equations numerically by the method of finite differences.\cite{courant1967partial} For the purposes of this study, we defined and used the CFL condition as the following:
+\begin{align*}
+if &\Delta x > c*\Delta t = stable\\
+if &\Delta x < c*\Delta t = unstable
+\end{align*}
+
+\section{Results}
+Show some of the results that you found for each method.  Particularly be sure to not any instabilities arising.
+
+\subsection{FTBS Euler Method}
+
+This scheme is unstable for negative wave speed values.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/FTBS_mac.png}
+\caption{$\rho$ vs distance plot generated using the FTBS method.}
+\end{center}
+\end{figure}
+
+\subsection{FTCS Euler Method}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/FTCS.png}
+\caption{FTCS Method performance.}
+\end{center}
+\end{figure}
+
+\subsection{Lax–Friedrichs Method}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/LF.png}
+\caption{Lax-Freidrichs Method performance.}
+\end{center}
+\end{figure}
+
+\subsection{Lax–Wendroff Method}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/LW.png}
+\caption{Lax-Wendroff Method performance.}
+\end{center}
+\end{figure}
+
+\subsection{MacCormack Method}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/mac.png}
+\caption{$\rho$ vs distance plot generated using the MacCormack method.}
+\end{center}
+\end{figure}
+
+\subsection{Numerical Dissipation}
+Numerical dissipation refers to the process of dampening oscillatory peak shocks by using the following equation:
+\begin{equation}
+\epsilon(\rho^n_{i+1}-2\rho^n_{i}+\rho^n_{i-1})\ \ \ \ \ \ 
+Where \ \ \ \ 0 < \epsilon < 1.
+\end{equation}
+The rest of the solution remains roughly the same. Equation 21 is added to MacCormack method's predictor step (equation 19).
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/dissipation.png}
+\caption{$\rho$ vs distance plot generated using the MacCormack method.}
+\end{center}
+\end{figure}
+
+\subsection{Reaction Time Delay Traffic Problem}
+Our final model was of the effects when the lead car in traffic momentarily applies their brakes which causes a time delay $\tau$ for each subsequent car as they react to the lead. The following function shows the velocity of the lead car before and after braking:
+\begin{equation}
+\phi (t) =
+\begin{cases} 
+      \bar{v} & where \ \ t\leq 0 \\
+      \bar{v}(1-b(t)) & where \ \ t > 0 
+\end{cases}
+\end{equation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[height = 2in]{images/jam.png}
+\caption{Traffic jam model, b(t) vs time.}
+\end{center}
+\end{figure}
+
+\section{Discussion}
+Discuss the differences between the approaches and their results to stably evolving the traffic problem. This section tends to be longer than the Conclusion section. 
+When comparing the five schemes, we found the FTBS (section 3.1) method to be the most stable, especially after numerical dissipation. The FTCS method was the least stable, most likely due to numerical diffusion caused by the first-order discretization described in section 3.2.
+
+\section{Conclusion}
+In this study we modeled traffic flow as a function of traffic density and speed which obeys a conservation law where flux is equal to the number of cars leaving the road per unit time. We compared five different schemes to model traffic behavior: Forward Time Backward Space, Foward Time Central Space, Lax-Friedrichs, Lax-Wendroff, and MacCormack. We found the Forward Time Backward Space MacCormack method to be the most accurate, especially after numerical dissipation was applied to dampen remaining shocks. The Lax-Friedrichs method is more stable than the FTCS method, but contains a first-order error caused by the discretization. Lax-Wendroff performs well, has a small shock, and is more stable than Lax-Friedrichs. The MacCormack method was found to be the second most stable method, behind the FTBS method. 
+
+
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+\end{document}
